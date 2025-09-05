@@ -3,694 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заработок в Telegram</title>
+    <title>EarnBot - Заработок в Telegram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            transition: all 0.3s ease;
-        }
-        
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --text-primary: #000000;
-            --text-secondary: #666666;
-            --accent: #007aff;
-            --card-bg: #ffffff;
-            --border: #e0e0e0;
-            --shadow: rgba(0, 0, 0, 0.1);
-        }
-        
-        .dark-theme {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-            --accent: #0a84ff;
-            --card-bg: #2d2d2d;
-            --border: #404040;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
-        
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 16px;
-            padding-bottom: 80px; /* Место для навигации */
-        }
-        
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-            padding: 20px 0;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-        
-        .theme-switcher {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px;
-            cursor: pointer;
-        }
-        
-        /* Карточка задания */
-        .task-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 20px var(--shadow);
-            border: 1px solid var(--border);
-            cursor: pointer;
-        }
-        
-        .task-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-        
-        .task-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-        
-        .task-reward {
-            font-size: 20px;
-            font-weight: bold;
-            color: #4CAF50;
-            text-align: right;
-        }
-        
-        /* Баланс */
-        .balance-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 20px var(--shadow);
-        }
-        
-        .balance-amount {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--accent);
-            margin: 10px 0;
-        }
-        
-        /* Кнопки */
-        .btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            margin: 8px 0;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-        
-        /* Навигация - ФИКСИРОВАННАЯ ВНИЗУ */
-        .nav {
-            display: flex;
-            justify-content: space-around;
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 16px;
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            box-shadow: 0 -4px 20px var(--shadow);
-            border: 1px solid var(--border);
-            z-index: 1000;
-        }
-        
-        .nav-item {
-            text-align: center;
-            cursor: pointer;
-            padding: 10px 16px;
-            border-radius: 12px;
-            flex: 1;
-            margin: 0 4px;
-        }
-        
-        .nav-item.active {
-            background: var(--accent);
-        }
-        
-        .nav-item.active .nav-icon,
-        .nav-item.active .nav-text {
-            color: white;
-        }
-        
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 4px;
-            color: var(--text-secondary);
-        }
-        
-        .nav-text {
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        /* Модальное окно задания */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 40px var(--shadow);
-        }
-        
-        .modal-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-        
-        .modal-reward {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        
-        .modal-desc {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .modal-url {
-            background: var(--bg-secondary);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            word-break: break-all;
-            font-size: 14px;
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-        }
-        
-        /* Профиль */
-        .profile-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 20px var(--shadow);
-        }
-        
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .profile-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-        
-        .profile-username {
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 20px 0;
-        }
-        
-        .stat-item {
-            background: var(--bg-secondary);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        
-        .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        
-        /* Контент вкладок */
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <!-- Шапка -->
-        <div class="header">
-            <h1>Что-то интересное</h1>
-            <p>Зарабатывайте выполняя задания</p>
+        <header class="header">
+            <h1>💎 EarnBot</h1>
+            <p>Зарабатывайте выполняя простые задания</p>
             <div class="theme-switcher" onclick="toggleTheme()">
-                🌙
+                <span id="theme-icon">🌙</span>
             </div>
-        </div>
-        
-        <!-- Вкладка Задания -->
-        <div id="tasks-tab" class="tab-content active">
-            <div class="balance-card">
-                <div style="color: var(--text-secondary);">Ваш баланс</div>
-                <div class="balance-amount" id="user-balance">0 ₽</div>
-                <button class="btn" onclick="withdrawMoney()">Вывести деньги</button>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Вкладка Задания -->
+            <div id="tasks-tab" class="tab-content active">
+                <div class="balance-card">
+                    <div class="balance-label">Ваш баланс</div>
+                    <div class="balance-amount" id="user-balance">0 ₽</div>
+                    <button class="btn btn-primary" onclick="withdrawMoney()">💸 Вывести деньги</button>
+                </div>
+
+                <div class="section-title">🔥 Доступные задания</div>
+                <div id="tasks-container" class="tasks-grid"></div>
             </div>
-            
-            <div id="tasks-container">
-                <!-- Задания будут здесь -->
+
+            <!-- Вкладка Фильтр -->
+            <div id="filter-tab" class="tab-content">
+                <div class="filter-card">
+                    <h3>🎯 Фильтр заданий</h3>
+                    
+                    <div class="filter-group">
+                        <label>Категории:</label>
+                        <div class="chips-container">
+                            <span class="chip active" data-category="all">Все</span>
+                            <span class="chip" data-category="registration">Регистрации</span>
+                            <span class="chip" data-category="app">Приложения</span>
+                            <span class="chip" data-category="social">Соцсети</span>
+                            <span class="chip" data-category="shopping">Покупки</span>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Награда:</label>
+                        <div class="chips-container">
+                            <span class="chip active" data-reward="all">Любая</span>
+                            <span class="chip" data-reward="50">50+ ₽</span>
+                            <span class="chip" data-reward="100">100+ ₽</span>
+                            <span class="chip" data-reward="200">200+ ₽</span>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Статус:</label>
+                        <div class="chips-container">
+                            <span class="chip active" data-status="all">Все</span>
+                            <span class="chip" data-status="available">Доступные</span>
+                            <span class="chip" data-status="completed">Выполненные</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="applyFilters()">Применить фильтры</button>
+                </div>
             </div>
-        </div>
-        
-        <!-- Вкладка Фильтр -->
-        <div id="filter-tab" class="tab-content">
-            <div class="balance-card">
-                <h3 style="margin-bottom: 16px; color: var(--text-primary);">Фильтр заданий</h3>
-                
-                <div style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">Категории:</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <span style="background: var(--accent); color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px;">Все</span>
-                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; font-size: 14px;">Регистрации</span>
-                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; font-size: 14px;">Покупки</span>
-                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; font-size: 14px;">Приложения</span>
+
+            <!-- Вкладка Профиль -->
+            <div id="profile-tab" class="tab-content">
+                <div class="profile-card">
+                    <div class="avatar-container">
+                        <div class="avatar" id="user-avatar">👤</div>
+                        <div class="online-dot"></div>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <h2 id="user-name">Загрузка...</h2>
+                        <p class="username" id="user-username">@username</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="completed-tasks">0</div>
+                            <div class="stat-label">Выполнено</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="available-tasks">12</div>
+                            <div class="stat-label">Доступно</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="success-rate">0%</div>
+                            <div class="stat-label">Успех</div>
+                        </div>
                     </div>
                 </div>
-                
-                <div style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">Награда:</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; font-size: 14px;">Любая</span>
-                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; font-size: 14px;">50+ ₽</span>
-                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; font-size: 14px;">100+ ₽</span>
+
+                <div class="profile-section">
+                    <h3>📊 Статистика за неделю</h3>
+                    <div class="stats-chart">
+                        <div class="chart-bar" style="height: 60%"><span>120₽</span></div>
+                        <div class="chart-bar" style="height: 80%"><span>180₽</span></div>
+                        <div class="chart-bar" style="height: 40%"><span>90₽</span></div>
+                        <div class="chart-bar" style="height: 100%"><span>250₽</span></div>
+                        <div class="chart-bar" style="height: 70%"><span>150₽</span></div>
+                        <div class="chart-bar" style="height: 50%"><span>110₽</span></div>
+                        <div class="chart-bar" style="height: 90%"><span>200₽</span></div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>🎁 Реферальная система</h3>
+                    <div class="referral-card">
+                        <p>Приглашайте друзей и получайте 10% от их заработка!</p>
+                        <div class="referral-stats">
+                            <div class="referral-stat">
+                                <strong id="ref-count">0</strong>
+                                <span>приглашенных</span>
+                            </div>
+                            <div class="referral-stat">
+                                <strong id="ref-earnings">0₽</strong>
+                                <span>заработано</span>
+                            </div>
+                        </div>
+                        <div class="referral-link">
+                            <input type="text" id="ref-link" value="https://t.me/your_bot?start=ref123" readonly>
+                            <button class="btn btn-small" onclick="copyRefLink()">Копировать</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Вкладка Профиль -->
-        <div id="profile-tab" class="tab-content">
-            <div class="profile-card">
-                <div class="avatar" id="user-avatar">👤</div>
-                <div class="profile-name" id="user-name">Загрузка...</div>
-                <div class="profile-username" id="user-username">@username</div>
-                
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="completed-tasks">0</div>
-                        <div class="stat-label">Выполнено</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="available-tasks">12</div>
-                        <div class="stat-label">Доступно</div>
-                    </div>
-                </div>
-                
-                <button class="btn" onclick="showProfileSettings()">Настройки профиля</button>
-            </div>
-            
-            <div class="balance-card">
-                <h3 style="margin-bottom: 16px; color: var(--text-primary);">Реферальная система</h3>
-                <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border);">
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Ваша реферальная ссылка:</div>
-                    <div style="word-break: break-all; font-weight: bold; color: var(--text-primary);">https://t.me/your_bot?start=ref123456</div>
-                </div>
-                <button class="btn btn-secondary" onclick="copyRefLink()">Скопировать ссылку</button>
-            </div>
-        </div>
-        
-        <!-- Модальное окно задания -->
-        <div id="task-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-title" id="modal-task-title">Название задания</div>
-                    <div class="modal-reward" id="modal-task-reward">+0 ₽</div>
-                </div>
-                
-                <div class="modal-desc" id="modal-task-desc">Описание задания...</div>
-                
-                <div style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">Ссылка для выполнения:</div>
-                    <div class="modal-url" id="modal-task-url">https://example.com</div>
-                </div>
-                
-                <div class="modal-actions">
-                    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                    <button class="btn" onclick="startTask()">Начать задание</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Навигация - ФИКСИРОВАННАЯ ВНИЗУ -->
-        <div class="nav">
+        </main>
+
+        <!-- Нижняя навигация -->
+        <nav class="bottom-nav">
             <div class="nav-item active" onclick="showTab('tasks')">
                 <div class="nav-icon">📋</div>
-                <div class="nav-text">Задания</div>
+                <div class="nav-label">Задания</div>
             </div>
             <div class="nav-item" onclick="showTab('filter')">
                 <div class="nav-icon">⚡</div>
-                <div class="nav-text">Фильтр</div>
+                <div class="nav-label">Фильтр</div>
             </div>
             <div class="nav-item" onclick="showTab('profile')">
                 <div class="nav-icon">👤</div>
-                <div class="nav-text">Профиль</div>
+                <div class="nav-label">Профиль</div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Модальное окно задания -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-task-title">Название задания</h3>
+                <div class="modal-reward" id="modal-task-reward">+0 ₽</div>
+                <span class="modal-close" onclick="closeModal()">×</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="task-info">
+                    <div class="info-item">
+                        <span class="info-icon">⏱️</span>
+                        <span>Время: <strong>3-5 минут</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🎯</span>
+                        <span>Сложность: <strong>Легкая</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📈</span>
+                        <span>Шанс успеха: <strong>95%</strong></span>
+                    </div>
+                </div>
+
+                <div class="task-description">
+                    <h4>📝 Описание</h4>
+                    <p id="modal-task-desc">Описание задания...</p>
+                </div>
+
+                <div class="task-instructions">
+                    <h4>📋 Инструкция</h4>
+                    <ol>
+                        <li>Перейдите по ссылке ниже</li>
+                        <li>Выполните требуемое действие</li>
+                        <li>Вернитесь в бот для подтверждения</li>
+                        <li>Получите вознаграждение!</li>
+                    </ol>
+                </div>
+
+                <div class="task-url">
+                    <label>🔗 Ссылка для выполнения:</label>
+                    <div class="url-display" id="modal-task-url">https://example.com</div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="startTask()">
+                    🚀 Начать задание
+                </button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Данные пользователя
-        let userData = {
-            balance: 1250,
-            completedTasks: 8,
-            availableTasks: 12
-        };
-        
-        // Данные заданий
-        const tasks = [
-            { 
-                id: 1, 
-                title: "Регистрация на сайте", 
-                desc: "Зарегистрируйтесь на сайте партнера, подтвердите email и заполните базовую информацию о себе. Это займет не более 3 минут.", 
-                reward: 50, 
-                url: "https://example.com/offer1",
-                category: "Регистрации"
-            },
-            { 
-                id: 2, 
-                title: "Установите приложение", 
-                desc: "Скачайте и установите мобильное приложение из App Store или Google Play. Запустите приложение и выполните первоначальную настройку.", 
-                reward: 100, 
-                url: "https://example.com/offer2",
-                category: "Приложения"
-            },
-            { 
-                id: 3, 
-                title: "Оформите заказ", 
-                desc: "Перейдите в интернет-магазин, добавьте товар в корзину и завершите покупку. Минимальная сумма заказа - 500 рублей.", 
-                reward: 200, 
-                url: "https://example.com/offer3",
-                category: "Покупки"
-            },
-            { 
-                id: 4, 
-                title: "Подписка на канал", 
-                desc: "Подпишитесь на наш Telegram канал и оставайтесь подписанным минимум 7 дней. Не отписывайтесь раньше времени!", 
-                reward: 30, 
-                url: "https://t.me/example_channel",
-                category: "Соцсети"
-            },
-            { 
-                id: 5, 
-                title: "Заполните анкету", 
-                desc: "Ответьте на 10 вопросов анкеты честно и развернуто. Ваши ответы помогут улучшить наши услуги.", 
-                reward: 75, 
-                url: "https://example.com/survey1",
-                category: "Опросы"
-            },
-            { 
-                id: 6, 
-                title: "Оформите подписку", 
-                desc: "Активируйте пробную подписку на 7 дней. Вы можете отменить её в любой момент до окончания пробного периода.", 
-                reward: 150, 
-                url: "https://example.com/subscribe",
-                category: "Подписки"
-            }
-        ];
-        
-        // Текущее выбранное задание
-        let currentTask = null;
-        
-        // Инициализация
-        window.onload = function() {
-            initTelegramWebApp();
-            loadTasks();
-            updateUserData();
-            loadUserProfile();
-        };
-        
-        // Инициализация Telegram WebApp
-        function initTelegramWebApp() {
-            try {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-                Telegram.WebApp.enableClosingConfirmation();
-                
-                // Устанавливаем цвет тему Telegram
-                Telegram.WebApp.setHeaderColor('#007aff');
-                Telegram.WebApp.setBackgroundColor('#f8f9fa');
-                
-            } catch (error) {
-                console.log('Telegram WebApp не доступен');
-            }
-        }
-        
-        // Загрузка профиля пользователя из Telegram
-        function loadUserProfile() {
-            try {
-                const user = Telegram.WebApp.initDataUnsafe.user;
-                if (user) {
-                    document.getElementById('user-name').textContent = 
-                        user.first_name + (user.last_name ? ' ' + user.last_name : '');
-                    
-                    document.getElementById('user-username').textContent = 
-                        user.username ? '@' + user.username : 'Без username';
-                    
-                    // Создаем аватар из первых букв имени
-                    const firstName = user.first_name || '';
-                    const lastName = user.last_name || '';
-                    const avatarText = (firstName.charAt(0) + (lastName ? lastName.charAt(0) : '')).toUpperCase();
-                    document.getElementById('user-avatar').textContent = avatarText;
-                }
-            } catch (error) {
-                console.log('Не удалось загрузить данные пользователя');
-            }
-        }
-        
-        // Показываем задания
-        function loadTasks() {
-            const container = document.getElementById('tasks-container');
-            container.innerHTML = '';
-            
-            tasks.forEach(task => {
-                const taskHTML = `
-                    <div class="task-card" onclick="openTaskModal(${task.id})">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-desc">${task.desc}</div>
-                        <div class="task-reward">+${task.reward} ₽</div>
-                    </div>
-                `;
-                container.innerHTML += taskHTML;
-            });
-        }
-        
-        // Обновляем данные пользователя
-        function updateUserData() {
-            document.getElementById('user-balance').textContent = userData.balance + ' ₽';
-            document.getElementById('completed-tasks').textContent = userData.completedTasks;
-            document.getElementById('available-tasks').textContent = userData.availableTasks;
-        }
-        
-        // Открыть модальное окно задания
-        function openTaskModal(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                currentTask = task;
-                
-                document.getElementById('modal-task-title').textContent = task.title;
-                document.getElementById('modal-task-desc').textContent = task.desc;
-                document.getElementById('modal-task-reward').textContent = '+' + task.reward + ' ₽';
-                document.getElementById('modal-task-url').textContent = task.url;
-                
-                document.getElementById('task-modal').style.display = 'flex';
-            }
-        }
-        
-        // Закрыть модальное окно
-        function closeModal() {
-            document.getElementById('task-modal').style.display = 'none';
-            currentTask = null;
-        }
-        
-        // Начать задание
-        function startTask() {
-            if (currentTask) {
-                // Открываем ссылку в браузере
-                window.open(currentTask.url, '_blank');
-                
-                // Закрываем модальное окно
-                closeModal();
-                
-                // Показываем уведомление
-                showNotification('Задание начато! Вернитесь после выполнения.');
-            }
-        }
-        
-        // Переключение вкладок
-        function showTab(tabName) {
-            // Скрываем все вкладки
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Показываем выбранную вкладку
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            // Обновляем навигацию
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-        }
-        
-        // Переключение темы
-        function toggleTheme() {
-            const body = document.body;
-            const themeSwitcher = document.querySelector('.theme-switcher');
-            
-            if (body.classList.contains('dark-theme')) {
-                body.classList.remove('dark-theme');
-                themeSwitcher.textContent = '🌙';
-                Telegram.WebApp.setBackgroundColor('#f8f9fa');
-            } else {
-                body.classList.add('dark-theme');
-                themeSwitcher.textContent = '☀️';
-                Telegram.WebApp.setBackgroundColor('#1a1a1a');
-            }
-        }
-        
-        // Вывод денег
-        function withdrawMoney() {
-            showNotification('Функция вывода скоро будет доступна!');
-        }
-        
-        // Настройки профиля
-        function showProfileSettings() {
-            showNotification('Настройки профиля в разработке');
-        }
-        
-        // Копирование реферальной ссылки
-        function copyRefLink() {
-            navigator.clipboard.writeText('https://t.me/your_bot?start=ref123456')
-                .then(() => showNotification('Ссылка скопирована!'))
-                .catch(() => showNotification('Не удалось скопировать ссылку'));
-        }
-        
-        // Показать уведомление
-        function showNotification(message) {
-            Telegram.WebApp.showAlert(message);
-        }
-        
-        // Закрытие модального окна по клику вне его
-        document.getElementById('task-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-        
-        // Закрытие по ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
